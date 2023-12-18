@@ -25,7 +25,24 @@ app.UseHttpLogging();
 app.UseHttpsRedirection();
 
 app.MapGet("/weatherforecast",
-        (string city, IWeatherService svc, CancellationToken ct) => svc.FetchAsync(city, ct).ToHttpResult())
+        async (string city, IWeatherService svc, CancellationToken ct) => 
+        {
+            return svc.FetchAsync(city, ct);
+
+            var (completed, notFound, validationFailure) = await svc.FetchAsync(city, ct);
+
+            if (notFound is not null)
+            {
+                return Results.NotFound();
+            }
+
+            if (validationFailure is not null)
+            {
+                return Results.ValidationProblem(validationFailure.Errors);
+            }
+
+            return Results.Ok(completed!.Value);
+        })
     .WithName("GetWeatherForecast")
     .WithOpenApi();
 

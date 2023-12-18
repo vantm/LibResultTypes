@@ -19,7 +19,7 @@ namespace LibResults;
             genericParameterConstraints.Add($"where T{j} : IFailure");
         }
 #>
-public sealed record Produces<<#= string.Join(", ", genericParameters) #>>(<#= string.Join(", ", recordParameters) #>)
+public sealed record Produces<<#= string.Join(", ", genericParameters) #>>(<#= string.Join(", ", recordParameters) #>) : IProduces
     <#= string.Join("\n    ", genericParameterConstraints) #>
 {
     public static implicit operator Produces<<#= string.Join(", ", genericParameters) #>>(T1 value)

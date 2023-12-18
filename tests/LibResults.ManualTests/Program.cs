@@ -7,19 +7,19 @@ var id = int.Parse(Console.ReadLine()!);
 Console.Write("New name of the user: ");
 var name = Console.ReadLine();
 
-var (ok, notFound, validationFailure) = ApplicationService.EditUser(id, name);
+var (completed, notFound, validationFailure) = ApplicationService.EditUser(id, name);
 
-if (ok != null)
+if (completed is not null)
 {
     Console.WriteLine("The user had been updated");
 }
 
-if (notFound != null)
+if (notFound is not null)
 {
     Console.WriteLine("There is no any user had associated with the ID '{0}'", 0);
 }
 
-if (validationFailure != null)
+if (validationFailure is not null)
 {
     Console.WriteLine("It can't update the user '{0}' because:", id);
     foreach (var (fieldName, fieldErrors) in validationFailure.Errors)
