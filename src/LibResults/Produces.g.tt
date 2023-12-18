@@ -1,0 +1,52 @@
+﻿<#@ template language="C#" #>
+<#@ output extension=".cs" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+namespace LibResults;
+
+<#
+    for (var i = 2; i <= 7; i++)
+    {
+        var genericParameters = new List<string> { "T1" };
+        var recordParameters = new List<string> { "T1? Result" };
+        var genericParameterConstraints = new List<string> { "where T1 : ISuccess" };
+
+        for (var j = 2; j <= i; j++)
+        {
+            genericParameters.Add($"T{j}");
+            recordParameters.Add($"T{j}? Error{j}");
+            genericParameterConstraints.Add($"where T{j} : IFailure");
+        }
+#>
+public sealed record Produces<<#= string.Join(", ", genericParameters) #>>(<#= string.Join(", ", recordParameters) #>)
+    <#= string.Join("\n    ", genericParameterConstraints) #>
+{
+    public static implicit operator Produces<<#= string.Join(", ", genericParameters) #>>(T1 value)
+        => new(value, <#= string.Join(", ", Enumerable.Repeat("default", genericParameters.Count - 1)) #>);
+<#
+        for (var j = 2; j <= i; j++)
+        {
+            var constructorParameters = new List<string>() { "default" };
+
+            for (var a = 2; a < j; a++)
+            {
+                constructorParameters.Add("default");
+            }
+
+            constructorParameters.Add("error");
+
+            for (var b = j + 1; b <= i; b++)
+            {
+                constructorParameters.Add("default");
+            }
+#>
+    public static implicit operator Produces<<#= string.Join(", ", genericParameters) #>>(T<#= j #> error)
+        => new(<#= string.Join(", ", constructorParameters) #>);
+<#
+        }
+#>
+}
+<#
+    }
+#>
